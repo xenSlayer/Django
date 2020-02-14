@@ -3,7 +3,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 from users import views as user_views
-from users.views import PostDetailView, PostCreateView, UpdatePost, PostDeleteView, CommentCreateView
+from users.views import PostDetailView, PostCreateView, UpdatePost, PostDeleteView, CommentCreateView, EditComment,\
+    CommentDeleteView
 
 
 urlpatterns = [
@@ -25,6 +26,10 @@ urlpatterns = [
     path('following/', user_views.following, name='following'),
     path('post/<int:pk>/like-dislike/', user_views.like_post, name='like-post'),
     path('accounts/delete/<str:username>/', views.delete_user, name='like-post'),
+    path('post/<int:pk>/comment/edit', EditComment.as_view(template_name='users/comment_edit.html'),
+         name='comment-edit'),
+    path('post/<int:pk>/comment/delete/', CommentDeleteView.as_view(template_name='users/comment_delete.html'),
+         name='comment-delete'),
 ]
 
 if settings.DEBUG:

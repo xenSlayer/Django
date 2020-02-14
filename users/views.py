@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect, HttpResponse
 from .forms import UserRegisterForm, UserUpdateForm, UserProfileForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -166,8 +166,8 @@ def comments(request, pk):
         'is_liked': is_liked,
         'total_likes': total_likes,
         'title': 'Post {}'.format(post.id),
-        'can_edit': can_edit
-    }
+        'can_edit': can_edit,
+            }
     return render(request, 'users/comments.html', comm)
 
 
@@ -235,3 +235,25 @@ def like_post(request, pk):
         post.likes.add(request.user)
         is_liked = True
     return HttpResponseRedirect('/post/{}/'.format(pk))
+
+
+class EditComment(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    fields = ['comment']
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.username:
+            return True
+        return False
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    success_url = '/'
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.username:
+            return True
+        return False
